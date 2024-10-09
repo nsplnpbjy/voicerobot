@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 )
 
 var (
@@ -31,8 +32,10 @@ func (a *App) V2T(audioData []byte) (string, error) {
 	return Voice2Text(audioData)
 }
 
-func (a *App) T2V(text string) ([]byte, error) {
-	return Text2Voice(text)
+func (a *App) T2V(text string) string {
+	mp3data, _ := Text2Voice(text)
+	base64Str := base64.StdEncoding.EncodeToString(mp3data)
+	return base64Str
 }
 func (a *App) VMT(text string) string {
 	return VMTB.VoiceMultiTalk(text)
