@@ -34,7 +34,7 @@ func (a *App) V2T(audioData []byte) (string, error) {
 
 func (a *App) T2V(text string) string {
 	mp3data, _ := Text2Voice(text)
-	base64Str := base64.StdEncoding.EncodeToString(mp3data)
+	base64Str := base64.StdEncoding.EncodeToString(mp3data) //此处必须将[]byte的音频转为base64编码，否则前端接收会出问题
 	return base64Str
 }
 func (a *App) VMT(text string) string {

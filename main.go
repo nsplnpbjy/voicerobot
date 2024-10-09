@@ -17,9 +17,10 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:  "voicerobot",
-		Width:  1024,
-		Height: 768,
+		Frameless: true,
+		Title:     "voicerobot",
+		Width:     1024,
+		Height:    768,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
