@@ -4,6 +4,9 @@ import { Button, Container, CssBaseline, AppBar, Toolbar, Typography, Paper, Box
 import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import MicIcon from '@mui/icons-material/Mic';
+import MicOffIcon from '@mui/icons-material/MicOff';
+import './App.css'; // 导入自定义CSS文件
 
 let theme = createTheme({
   palette: {
@@ -34,10 +37,11 @@ const App = () => {
   const [audioSrc, setAudioSrc] = useState('');
   const [messages, setMessages] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentAudio, setCurrentAudio] = useState(null); 
+  const [currentAudio, setCurrentAudio] = useState(null);
+
   const audioChunksRef = useRef([]);
   const audioRefs = useRef([]);
-  const messagesEndRef = useRef(null); // 用于跟踪对话列表底部
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     if (audioChunks.length && !isRecording) {
@@ -47,7 +51,7 @@ const App = () => {
   }, [audioChunks, isRecording]);
 
   useEffect(() => {
-    scrollToBottom(); // 在messages变化时自动滚动到底部
+    scrollToBottom();
   }, [messages]);
 
   const scrollToBottom = () => {
@@ -57,7 +61,6 @@ const App = () => {
   const startRecording = async () => {
     try {
       stopAllAudios();
-
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
       setMediaRecorder(recorder);
@@ -90,7 +93,8 @@ const App = () => {
           stopAllAudios();
           audio.play();
           setIsPlaying(true);
-          setCurrentAudio(audio); 
+          setCurrentAudio(audio);
+
           audioRefs.current.push(audio);
           audio.onpause = () => setIsPlaying(false);
           audio.onplay = () => setIsPlaying(true);
@@ -123,12 +127,12 @@ const App = () => {
         audio.currentTime = 0;
       }
     });
-    setCurrentAudio(null); 
+    setCurrentAudio(null);
   };
 
   const handlePlayPause = () => {
     if (isPlaying) {
-      currentAudio.pause(); 
+      currentAudio.pause();
       setIsPlaying(false);
     } else {
       if (currentAudio) {
@@ -146,7 +150,7 @@ const App = () => {
           <Typography variant="h6">白胖的语音AI</Typography>
         </Toolbar>
       </AppBar>
-      <Container maxWidth="md" style={{ marginTop: '20px', height: 'calc(100% - 64px)', position: 'relative' }}>
+      <Container maxWidth="md" style={{ marginTop: '20px', height: 'calc(100% - 64px)', position: 'relative', backgroundColor: '#121212' }}>
         <Box
           position="fixed"
           bottom={20}
@@ -156,24 +160,24 @@ const App = () => {
           flexDirection="column"
           gap={2}
         >
-          <Button
-            variant="contained"
-            color={isRecording ? "secondary" : "primary"}
+          <IconButton
             onClick={isRecording ? stopRecording : startRecording}
+            color={isRecording ? "secondary" : "primary"}
+            className={isRecording ? "recording" : ""}
           >
-            {isRecording ? '停止录音' : '开始录音'}
-          </Button>
+            {isRecording ? <MicIcon /> : <MicOffIcon />}
+          </IconButton>
           <IconButton onClick={handlePlayPause} color="primary">
             {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
           </IconButton>
         </Box>
         <Box mt={3}>
           {messages.map((msg, index) => (
-            <Paper key={index} style={{ padding: '10px', marginBottom: '10px', textAlign: msg.sender === '用户' ? 'right' : 'left' }}>
+            <Paper key={index} style={{ padding: '10px', marginBottom: '10px', textAlign: msg.sender === '用户' ? 'right' : 'left', backgroundColor: '#1d1d1d' }}>
               <Typography variant="body1"><strong>{msg.sender}:</strong> {msg.text}</Typography>
             </Paper>
           ))}
-          <div ref={messagesEndRef} /> {/* 用于滚动到底部 */}
+          <div ref={messagesEndRef} />
         </Box>
         {audioSrc && (
           <Box mt={3}>
