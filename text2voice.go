@@ -10,6 +10,7 @@ import (
 
 const (
 	Text2VoiceUrl = "https://tsn.baidu.com/text2audio"
+	MaxTextLength = 5000
 )
 
 func Text2Voice(text string) ([]byte, error) {
@@ -17,13 +18,20 @@ func Text2Voice(text string) ([]byte, error) {
 	if !TokenInfoVar.IsAuth() {
 		TokenInfoVar.VoiceAuth()
 	}
+
+	// First encoding
+	firstEncodedText := url.QueryEscape(text)
+	if len(firstEncodedText) > MaxTextLength {
+		firstEncodedText = url.QueryEscape("文本过长，请自行阅读")
+	}
+
 	formdata.Set("tok", TokenInfoVar.Access_token)
 	formdata.Set("cuid", CUID)
 	formdata.Set("ctp", "1")
 	formdata.Set("lan", "zh")
 	formdata.Set("per", "0")
 	formdata.Set("aue", "3")
-	formdata.Set("tex", text)
+	formdata.Set("tex", firstEncodedText) // Use twice encoded text
 
 	body := bytes.NewBufferString(formdata.Encode())
 	req, err := http.NewRequest("POST", Text2VoiceUrl, body)
@@ -32,7 +40,6 @@ func Text2Voice(text string) ([]byte, error) {
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -53,6 +60,7 @@ func Text2Voice(text string) ([]byte, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to read response body: %w", err)
 		}
+		println(string(bodyBytes))
 		return nil, fmt.Errorf("API error: %s", string(bodyBytes))
 	}
 }
